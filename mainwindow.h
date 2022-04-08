@@ -11,10 +11,16 @@ class MainWindow : public QMainWindow
 
 	protected:
 		void paintEvent(QPaintEvent* event) override;
+		void mouseMoveEvent(QMouseEvent* event) override;
+
+	private:
+		bool validId(uint32_t id) const;
 
 	private:
 		QPointF startPoint;
-		uint rowCount;
-		uint colCount;
-		uint radius;
+		int rowCount;
+		int colCount;
+		double radius;
+		// bool noUpdateGrid;
+		uint32_t id, lastid;
 };

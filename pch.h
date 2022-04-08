@@ -6,6 +6,7 @@
 #include <QApplication>
 #include <QLocale>
 #include <QMainWindow>
+#include <QMouseEvent>
 #include <QPainter>
 #include <QTranslator>
 
