@@ -5,3 +5,4 @@ uint Global::windowWidth  = 1280;
 uint Global::colCount     = 15;
 uint Global::rowCount     = 11;
 uint Global::blockRadius  = 35;
+QPointF Global::startPoint {50, 50};

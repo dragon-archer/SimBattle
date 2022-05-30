@@ -4,6 +4,7 @@
 #define _SIMBATTLE_MAINWINDOW_H_ 1
 
 #include "pch.h"
+#include "utility.h"
 
 class MainWindow : public QMainWindow
 {
@@ -17,14 +18,8 @@ class MainWindow : public QMainWindow
 		void mouseMoveEvent(QMouseEvent* event) override;
 
 	private:
-		bool validId(uint32_t id) const;
-
-	private:
 		QPointF startPoint;
-		double radius;
-		uint32_t id;
-		int rowCount;
-		int colCount;
+		HexPosition mousePos;
 		bool drawShadow;
 };
 

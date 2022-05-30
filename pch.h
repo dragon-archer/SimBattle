@@ -29,6 +29,7 @@ class Global
 		static uint rowCount;
 		static uint colCount;
 		static uint blockRadius;
+		static QPointF startPoint;
 };
 
 // Trait macros

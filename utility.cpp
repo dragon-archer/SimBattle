@@ -17,7 +17,7 @@ void setupPainter(QPainter& painter, QPaintDevice* object) {
 }
 
 // Note: Result is cached, so colCount, rowCount, and radius should not change
-void drawGrid(QPainter& painter, QPointF startPoint, int colCount, int rowCount, double radius) {
+void drawGrid(QPainter& painter, QPointF startPoint, int rowCount, int colCount, double radius) {
 	static QPixmap bgPixmap;
 	static bool isInited = false;
 	IF_LIKELY(isInited) {
@@ -25,7 +25,7 @@ void drawGrid(QPainter& painter, QPointF startPoint, int colCount, int rowCount,
 		return;
 	}
 	QPainter p;
-	QImage bgImage(sqrt(3) * radius * (colCount + 0.5), radius * (1.5 * rowCount + 0.5), QImage::Format_ARGB32);
+	QImage bgImage(sqrt(3) * radius * (colCount + 0.5), radius * (1.5 * rowCount + 0.5), QImage::Format_ARGB32_Premultiplied);
 	setupPainter(p, &bgImage);
 
 	double r = radius;
@@ -100,36 +100,29 @@ void drawGrid(QPainter& painter, QPointF startPoint, int colCount, int rowCount,
 }
 
 // Note: reesult is cached, so radius should not change
-void drawHexagon(QPainter& painter, QPointF startPoint, double radius, bool erase) {
+void drawHexagon(QPainter& painter, QPointF startPoint, double r) {
 	static QPixmap hexagonPixmap;
 	static bool isInited = false;
-	IF_UNLIKELY(!isInited) {
-		double r = radius, r1 = radius * sqrt(3) / 2, r2 = radius * 0.5;
-		QPolygonF hexagon { QPointF{r1, 0}, QPointF{2 * r1, r2},
-							QPointF{2 * r1, 3 * r2}, QPointF{r1, 2 * r},
-							QPointF{0, 3 * r2}, QPointF{0, r2}};
-		QImage hexagonImage(2 * r1, 2 * r, QImage::Format_ARGB32);
-		QPainter p;
-		setupPainter(p, &hexagonImage);
-		p.drawPolygon(hexagon);
-		p.end();
-		hexagonPixmap = QPixmap::fromImage(hexagonImage);
-		isInited = true;
+	IF_LIKELY(isInited) {
+		painter.drawPixmap(startPoint, hexagonPixmap);
+		return;
 	}
-	auto oldMode = painter.compositionMode();
-	IF_UNLIKELY(erase) {
-		painter.setCompositionMode(QPainter::CompositionMode_Clear);
-	}
-	painter.drawPixmap(startPoint, hexagonPixmap);
-	IF_UNLIKELY(erase) {
-		painter.setCompositionMode(oldMode);
-	}
+	double r1 = r * sqrt(3) / 2, r2 = r * 0.5;
+	QPolygonF hexagon { QPointF{r1, 0}, QPointF{2 * r1, r2},
+						QPointF{2 * r1, 3 * r2}, QPointF{r1, 2 * r},
+						QPointF{0, 3 * r2}, QPointF{0, r2}};
+	QImage hexagonImage(2 * r1, 2 * r, QImage::Format_ARGB32_Premultiplied);
+	QPainter p;
+	setupPainter(p, &hexagonImage);
+	p.drawPolygon(hexagon);
+	p.end();
+	hexagonPixmap = QPixmap::fromImage(hexagonImage);
+	isInited = true;
 }
 
-uint32_t posToHexId(double x, double y, double radius) {
-	double r = radius;
+HexPosition posToHex(double x, double y, double r) {
 	double sqrt3 = sqrt(3);
-	double sqrt3r = radius * sqrt3;
+	double sqrt3r = r * sqrt3;
 	double r0;
 	int i = floor(x / sqrt3r);
 	int j = floor(y / (1.5 * r));
@@ -157,19 +150,5 @@ uint32_t posToHexId(double x, double y, double radius) {
 			}
 		}
 	}
-	return ((i & 0xFFFF) << 16) | (j & 0xFFFF);
-}
-
-// Left-Bottoom Point
-QPointF idToPoint(uint32_t id, QPointF startPoint, double radius) {
-	double a, b;
-	double r = radius;
-	double sqrt3r = radius * sqrt(3);
-	int x = id >> 16, y = id & 0xFFFF;
-	a = x * sqrt3r;
-	b = y * 1.5 * r;
-	if(!(y & 1)) {
-		a += 0.5 * sqrt3r;
-	}
-	return startPoint + QPointF {a, b};
+	return HexPosition{i, j};
 }
