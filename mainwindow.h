@@ -1,5 +1,8 @@
 #pragma once
 
+#ifndef _SIMBATTLE_MAINWINDOW_H_
+#define _SIMBATTLE_MAINWINDOW_H_ 1
+
 #include "pch.h"
 
 class MainWindow : public QMainWindow
@@ -18,9 +21,11 @@ class MainWindow : public QMainWindow
 
 	private:
 		QPointF startPoint;
+		double radius;
+		uint32_t id;
 		int rowCount;
 		int colCount;
-		double radius;
-		// bool noUpdateGrid;
-		uint32_t id, lastid;
+		bool drawShadow;
 };
+
+#endif // _SIMBATTLE_MAINWINDOW_H_

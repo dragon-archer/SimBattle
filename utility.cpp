@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "utility.h"
 
-void setupPainter(QPainter& painter, QWidget* object) {
+void setupPainter(QPainter& painter, QPaintDevice* object) {
 	painter.begin(object);
 	painter.setWindow(0, object->height(), object->width(), -1 * object->height());
 	painter.setRenderHint(QPainter::Antialiasing);
@@ -16,132 +16,159 @@ void setupPainter(QPainter& painter, QWidget* object) {
 	painter.setBrush(brush);
 }
 
-void drawGrid(QPainter& painter, QPointF startPoint, int rowCount, int colCount, double radius) {
+// Note: Result is cached, so colCount, rowCount, and radius should not change
+void drawGrid(QPainter& painter, QPointF startPoint, int colCount, int rowCount, double radius) {
+	static QPixmap bgPixmap;
+	static bool isInited = false;
+	IF_LIKELY(isInited) {
+		painter.drawPixmap(startPoint, bgPixmap);
+		return;
+	}
+	QPainter p;
+	QImage bgImage(sqrt(3) * radius * (colCount + 0.5), radius * (1.5 * rowCount + 0.5), QImage::Format_ARGB32);
+	setupPainter(p, &bgImage);
+
 	double r = radius;
 	double sqrt3r = r * sqrt(3);
-	double basex = startPoint.x(), basey = startPoint.y();
-	for(int i = 0; i < rowCount; ++i) {
-		for(int j = 0; j < colCount; ++j) {
+	for(int i = 0; i < colCount; ++i) {
+		for(int j = 0; j < rowCount; ++j) {
 			if(j & 1) {
 				// bottom -> top
-				painter.drawLine(i * sqrt3r + 0.5 * sqrt3r + basex, 0.5 * r + 1.5 * r * j + basey,
-								 i * sqrt3r + 0.5 * sqrt3r + basex, 1.5 * r + 1.5 * r * j + basey);
+				p.drawLine( i * sqrt3r, 0.5 * r + 1.5 * r * j,
+							i * sqrt3r, 1.5 * r + 1.5 * r * j);
 				// bottom left -> top right
-				painter.drawLine(i * sqrt3r + 1.0 * sqrt3r + basex, 1.5 * r * j + basey,
-								 i * sqrt3r + 1.5 * sqrt3r + basex, 0.5 * r + 1.5 * r * j + basey);
+				p.drawLine( i * sqrt3r + 0.5 * sqrt3r, 1.5 * r * j,
+							i * sqrt3r + 1.0 * sqrt3r, 0.5 * r + 1.5 * r * j);
 				// bottom right -> top left
-				painter.drawLine(i * sqrt3r + 1.0 * sqrt3r + basex, 1.5 * r * j + basey,
-								 i * sqrt3r + 0.5 * sqrt3r + basex, 0.5 * r + 1.5 * r * j + basey);
+				p.drawLine( i * sqrt3r + 0.5 * sqrt3r, 1.5 * r * j,
+							i * sqrt3r, 0.5 * r + 1.5 * r * j);
 			} else {
 				// bottom -> top
-				painter.drawLine(i * sqrt3r + basex, 0.5 * r + 1.5 * r * j + basey,
-								 i * sqrt3r + basex, 1.5 * r + 1.5 * r * j + basey);
+				p.drawLine( i * sqrt3r + 0.5 * sqrt3r, 0.5 * r + 1.5 * r * j,
+							i * sqrt3r + 0.5 * sqrt3r, 1.5 * r + 1.5 * r * j);
 				// bottom left -> top right
-				painter.drawLine(i * sqrt3r + 0.5 * sqrt3r + basex, 1.5 * r * j + basey,
-								 i * sqrt3r + 1.0 * sqrt3r + basex, 0.5 * r + 1.5 * r * j + basey);
+				p.drawLine( i * sqrt3r + 1.0 * sqrt3r, 1.5 * r * j,
+							i * sqrt3r + 1.5 * sqrt3r, 0.5 * r + 1.5 * r * j);
 				// bottom right -> top left
-				painter.drawLine(i * sqrt3r + 0.5 * sqrt3r + basex, 1.5 * r * j + basey,
-								 i * sqrt3r + basex, 0.5 * r + 1.5 * r * j + basey);
+				p.drawLine( i * sqrt3r + 1.0 * sqrt3r, 1.5 * r * j,
+							i * sqrt3r + 0.5 * sqrt3r, 0.5 * r + 1.5 * r * j);
 			}
 			// Special: right boarder
 			// j is even & i not zero
-			if(!(j & 1) && !i) {
-				painter.drawLine(basex, 1.5 * r + 1.5 * r * j + basey,
-								 0.5 * sqrt3r + basex, 2.0 * r + 1.5 * r * j + basey);
+			if((j & 1) && !i) {
+				p.drawLine( 0, 1.5 * r + 1.5 * r * j,
+							0.5 * sqrt3r, 2.0 * r + 1.5 * r * j);
 			}
 		}
-		// j == colCount - 1
-		if(colCount & 1) basex -= 0.5 * sqrt3r;
+		// j == rowCount - 1
+		double basex = 0;
+		if(rowCount & 1) basex = -0.5 * sqrt3r;
 		// bottom left -> top right
-		painter.drawLine(i * sqrt3r + 0.5 * sqrt3r + basex, 1.5 * r * colCount + basey,
-						 i * sqrt3r + 1.0 * sqrt3r + basex, 0.5 * r + 1.5 * r * colCount + basey);
+		p.drawLine( basex + i * sqrt3r + 1.0 * sqrt3r, 1.5 * r * rowCount,
+					basex + i * sqrt3r + 1.5 * sqrt3r, 0.5 * r + 1.5 * r * rowCount);
 		// bottom right -> top left
-		if(i) {
-			painter.drawLine(i * sqrt3r + 0.5 * sqrt3r + basex, 1.5 * r * colCount + basey,
-							 i * sqrt3r + basex, 0.5 * r + 1.5 * r * colCount + basey);
+		IF_LIKELY(i) {
+			p.drawLine( basex + i * sqrt3r + 1.0 * sqrt3r, 1.5 * r * rowCount,
+						basex + i * sqrt3r + 0.5 * sqrt3r, 0.5 * r + 1.5 * r * rowCount);
 		}
-		if(colCount & 1) basex += 0.5 * sqrt3r;
 	}
-	for(int j = 0; j < colCount; ++j) {
+	for(int j = 0; j < rowCount; ++j) {
 		if(j & 1) {
 			// bottom -> top
-			painter.drawLine(rowCount * sqrt3r + 0.5 * sqrt3r + basex, 0.5 * r + 1.5 * r * j + basey,
-							 rowCount * sqrt3r + 0.5 * sqrt3r + basex, 1.5 * r + 1.5 * r * j + basey);
+			p.drawLine( colCount * sqrt3r, 0.5 * r + 1.5 * r * j,
+						colCount * sqrt3r, 1.5 * r + 1.5 * r * j);
+			// bottom right -> top left
+			IF_LIKELY(j) {
+				p.drawLine( colCount * sqrt3r + 0.5 * sqrt3r, 1.5 * r * j,
+							colCount * sqrt3r, 0.5 * r + 1.5 * r * j);
+			}
 		} else {
 			// bottom -> top
-			painter.drawLine(rowCount * sqrt3r + basex, 0.5 * r + 1.5 * r * j + basey,
-							 rowCount * sqrt3r + basex, 1.5 * r + 1.5 * r * j + basey);
-			// bottom right -> top left
-			if(j) {
-				painter.drawLine(rowCount * sqrt3r + 0.5 * sqrt3r + basex, 1.5 * r * j + basey,
-								 rowCount * sqrt3r + basex, 0.5 * r + 1.5 * r * j + basey);
-			}
+			p.drawLine( colCount * sqrt3r + 0.5 * sqrt3r, 0.5 * r + 1.5 * r * j,
+						colCount * sqrt3r + 0.5 * sqrt3r, 1.5 * r + 1.5 * r * j);
 		}
 	}
-	if(colCount & 1) basex -= 0.5 * sqrt3r;
-	painter.drawLine(rowCount * sqrt3r + 0.5 * sqrt3r + basex, 1.5 * r * colCount + basey,
-					 rowCount * sqrt3r + basex, 0.5 * r + 1.5 * r * colCount + basey);
-	if(colCount & 1) basex += 0.5 * sqrt3r;
+	double basex = 0;
+	if(rowCount & 1) basex = 0.5 * sqrt3r;
+	p.drawLine( basex + colCount * sqrt3r, 1.5 * r * rowCount,
+				basex + colCount * sqrt3r - 0.5 * sqrt3r, 0.5 * r + 1.5 * r * rowCount);
+
+	p.end();
+	bgPixmap = QPixmap::fromImage(bgImage);
+	isInited = true;
+	painter.drawPixmap(startPoint, bgPixmap);
 }
 
+// Note: reesult is cached, so radius should not change
 void drawHexagon(QPainter& painter, QPointF startPoint, double radius, bool erase) {
+	static QPixmap hexagonPixmap;
+	static bool isInited = false;
+	IF_UNLIKELY(!isInited) {
+		double r = radius, r1 = radius * sqrt(3) / 2, r2 = radius * 0.5;
+		QPolygonF hexagon { QPointF{r1, 0}, QPointF{2 * r1, r2},
+							QPointF{2 * r1, 3 * r2}, QPointF{r1, 2 * r},
+							QPointF{0, 3 * r2}, QPointF{0, r2}};
+		QImage hexagonImage(2 * r1, 2 * r, QImage::Format_ARGB32);
+		QPainter p;
+		setupPainter(p, &hexagonImage);
+		p.drawPolygon(hexagon);
+		p.end();
+		hexagonPixmap = QPixmap::fromImage(hexagonImage);
+		isInited = true;
+	}
 	auto oldMode = painter.compositionMode();
-	if(erase) {
+	IF_UNLIKELY(erase) {
 		painter.setCompositionMode(QPainter::CompositionMode_Clear);
 	}
-	double r = radius, r1 = radius * sqrt(3) / 2, r2 = radius * 0.5;
-	QPolygonF hexagon {startPoint + QPointF{r1, r2}, startPoint + QPointF{0, r},
-					   startPoint + QPointF{-r1, r2}, startPoint + QPointF{-r1, -r2},
-					   startPoint + QPointF{0, -r}, startPoint + QPointF{r1, -r2}};
-	painter.drawPolygon(hexagon);
-	if(erase) {
+	painter.drawPixmap(startPoint, hexagonPixmap);
+	IF_UNLIKELY(erase) {
 		painter.setCompositionMode(oldMode);
 	}
 }
 
 uint32_t posToHexId(double x, double y, double radius) {
 	double r = radius;
-	double sqrt3r = radius * sqrt(3);
-	bool odd = false;
-	int i = x / sqrt3r;
-	int j = y / (1.5 * r);
-	double r0 = y - j * 1.5 * r;
 	double sqrt3 = sqrt(3);
-	if(r0 >= 0.5 * r) { // easy mode
-		odd = j & 1;
-		if(odd) {
-			i = (x - 0.5 * sqrt3r) / sqrt3r;
+	double sqrt3r = radius * sqrt3;
+	double r0;
+	int i = floor(x / sqrt3r);
+	int j = floor(y / (1.5 * r));
+	bool odd = j & 1;
+	r0 = y - 1.5 * j * r;
+	IF_LIKELY(r0 >= 0.5 * r) { // easy mode
+		if(!odd) {
+			i = floor((x - 0.5 * sqrt3r) / sqrt3r);
 		}
 	} else {
 		double r1 = x - i * sqrt3r;
-		odd = j & 1;
-		if(odd) {
-			i = (x - 0.5 * sqrt3r) / sqrt3r;
+		if(!odd) {
+			i = floor((x - 0.5 * sqrt3r) / sqrt3r);
 			r1 = x - 0.5 * sqrt3r - i * sqrt3r;
 		}
 		if(r1 <= 0.5 * sqrt3r) {
 			if(r0 * sqrt3 <= (0.5 * sqrt3r - r1)) {
-				if(!odd) i -= 1;
+				if(odd) i -= 1;
 				j -= 1;
 			}
 		} else {
 			if(r0 * sqrt3 <= (r1 - 0.5 * sqrt3r)) {
 				j -= 1;
-				if(odd) i += 1;
+				if(!odd) i += 1;
 			}
 		}
 	}
 	return ((i & 0xFFFF) << 16) | (j & 0xFFFF);
 }
 
+// Left-Bottoom Point
 QPointF idToPoint(uint32_t id, QPointF startPoint, double radius) {
-	int x = id >> 16, y = id & 0xFFFF;
 	double a, b;
 	double r = radius;
 	double sqrt3r = radius * sqrt(3);
-	a = x * sqrt3r + 0.5 * sqrt3r;
-	b = y * 1.5 * r + r;
-	if(y & 1) {
+	int x = id >> 16, y = id & 0xFFFF;
+	a = x * sqrt3r;
+	b = y * 1.5 * r;
+	if(!(y & 1)) {
 		a += 0.5 * sqrt3r;
 	}
 	return startPoint + QPointF {a, b};
