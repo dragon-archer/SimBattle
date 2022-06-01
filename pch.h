@@ -5,6 +5,7 @@
 
 // STL Headers
 #include <cmath>
+#include <version>
 
 // Qt Headers
 #ifndef NDEBUG
@@ -13,9 +14,15 @@
 #include <QApplication>
 #include <QLocale>
 #include <QMainWindow>
+#include <QMessageBox>
 #include <QMouseEvent>
 #include <QPainter>
+#include <QTimer>
 #include <QTranslator>
+
+// Thirdparty Headers
+#include <thirdparty/json/json.hpp>
+using namespace nlohmann;
 
 // Global variables
 class Global
@@ -24,11 +31,11 @@ class Global
 		Global() = delete;
 		~Global() = delete;
 	public:
-		static uint windowHeight;
-		static uint windowWidth;
-		static uint rowCount;
-		static uint colCount;
-		static uint blockRadius;
+		static uint32_t windowHeight;
+		static uint32_t windowWidth;
+		static uint32_t rowCount;
+		static uint32_t colCount;
+		static uint32_t blockRadius;
 		static QPointF startPoint;
 };
 

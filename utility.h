@@ -5,8 +5,11 @@
 
 #include "pch.h"
 
-// Classes declartions
+// Class declartions
 class HexPosition;
+
+// Init functions
+bool loadResource();
 
 // Paint functions
 void setupPainter(QPainter& painter, QPaintDevice* object);
@@ -17,7 +20,10 @@ void drawHexagon(QPainter& painter, QPointF startPoint, double r = Global::block
 // Transfom functions
 HexPosition posToHex(double x, double y, double r = Global::blockRadius);
 
-// Classes Definitions
+// Others
+void exitProgram(); // TODO: Find a better way to exit Qt. Qt's design is stupid here.
+
+// Class Definitions
 class HexPosition {
 	private:
 		int16_t _x;

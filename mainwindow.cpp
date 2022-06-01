@@ -2,13 +2,16 @@
 #include "mainwindow.h"
 
 MainWindow::MainWindow(QWidget *parent)
-	: QMainWindow(parent) {
+	: QMainWindow(parent), startPoint(Global::startPoint), drawShadow(false) {
+	if(!loadResource()) {
+		QMessageBox::critical(this, tr("Error"), tr("Failed to load resource file!"), QMessageBox::Ok, QMessageBox::Ok);
+		exitProgram();
+		return;
+	}
 	this->setFixedSize(Global::windowWidth, Global::windowHeight);
 	grabMouse();
 	grabKeyboard();
 	setMouseTracking(true);
-	startPoint = Global::startPoint;
-	drawShadow = false;
 }
 
 MainWindow::~MainWindow() {
@@ -39,5 +42,4 @@ void MainWindow::mouseMoveEvent(QMouseEvent* event) {
 		drawShadow = false;
 		update();
 	}
-	qDebug() << mousePos.x() << mousePos.y();
 }

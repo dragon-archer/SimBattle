@@ -4,17 +4,14 @@
 int main(int argc, char *argv[])
 {
 	QApplication a(argc, argv);
-
-	QTranslator translator;
-	const QStringList uiLanguages = QLocale::system().uiLanguages();
-	for(const QString &locale : uiLanguages)
-	{
-		const QString baseName = "SimBattle_" + QLocale(locale).name();
-		if(translator.load(":/i18n/" + baseName))
-		{
-			a.installTranslator(&translator);
-			break;
-		}
+	QTranslator qtTranslator, appTranslator;
+	if(qtTranslator.load(":/localisation/qtbase_zh_CN")) {
+		qDebug() << "Load Qt Translation";
+		a.installTranslator(&qtTranslator);
+	}
+	if(appTranslator.load(":/localisation/SimBattle_zh_CN")) {
+		qDebug() << "Load SimBattle Translation";
+		a.installTranslator(&appTranslator);
 	}
 	MainWindow w;
 	w.show();

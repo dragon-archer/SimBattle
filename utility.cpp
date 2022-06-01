@@ -1,6 +1,10 @@
 #include "pch.h"
 #include "utility.h"
 
+bool loadResource() {
+	return false;
+}
+
 void setupPainter(QPainter& painter, QPaintDevice* object) {
 	painter.begin(object);
 	painter.setWindow(0, object->height(), object->width(), -1 * object->height());
@@ -151,4 +155,11 @@ HexPosition posToHex(double x, double y, double r) {
 		}
 	}
 	return HexPosition{i, j};
+}
+
+void exitProgram() {
+	QTimer* timer = new QTimer;
+	timer->setInterval(100);
+	QObject::connect(timer, QTimer::timeout, qApp, QApplication::quit, Qt::QueuedConnection);
+	timer->start();
 }

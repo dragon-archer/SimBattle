@@ -1,8 +1,8 @@
 #include "pch.h"
 
-uint Global::windowHeight = 720;
-uint Global::windowWidth  = 1280;
-uint Global::colCount     = 15;
-uint Global::rowCount     = 11;
-uint Global::blockRadius  = 35;
+uint32_t Global::windowHeight = 720;
+uint32_t Global::windowWidth  = 1280;
+uint32_t Global::colCount     = 15;
+uint32_t Global::rowCount     = 11;
+uint32_t Global::blockRadius  = 35;
 QPointF Global::startPoint {50, 50};

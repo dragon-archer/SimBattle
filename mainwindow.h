@@ -18,6 +18,7 @@ class MainWindow : public QMainWindow
 		void mouseMoveEvent(QMouseEvent* event) override;
 
 	private:
+		QMessageBox* m;
 		QPointF startPoint;
 		HexPosition mousePos;
 		bool drawShadow;
