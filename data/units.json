@@ -1,0 +1,15 @@
+{
+	"units": [
+		{
+			"pikeman": {
+				"health": 10,
+				"attack": 4,
+				"defense": 5,
+				"minDamage": 1,
+				"maxDamage": 3,
+				"speed": 4,
+				"shots": 0
+			}
+		}
+	]
+}

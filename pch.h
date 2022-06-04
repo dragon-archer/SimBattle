@@ -6,12 +6,13 @@
 // STL Headers
 #include <cmath>
 #include <version>
+#include <unordered_map>
 
 // Qt Headers
-#ifndef NDEBUG
-	#include <QDebug>
-#endif
 #include <QApplication>
+#include <QDate>
+#include <QDebug>
+#include <QFile>
 #include <QLocale>
 #include <QMainWindow>
 #include <QMessageBox>
@@ -31,12 +32,17 @@ class Global
 		Global() = delete;
 		~Global() = delete;
 	public:
+		enum {
+			UNIT_FILE = 0,
+			DATA_COUNT
+		};
 		static uint32_t windowHeight;
 		static uint32_t windowWidth;
 		static uint32_t rowCount;
 		static uint32_t colCount;
 		static uint32_t blockRadius;
-		static QPointF startPoint;
+		static QPointF  startPoint;
+		static QString  dataFileNames[DATA_COUNT];
 };
 
 // Trait macros
@@ -56,17 +62,15 @@ class Global
 	#define SIMBATTLE_CXX20
 #endif
 
-#ifdef __has_cpp_attribute
-	#if __has_cpp_attribute(likely)
-		#define IF_LIKELY(x)	if(x) [[likely]]
-		#define IF_UNLIKELY(x)	if(x) [[unlikely]]
-	#elif SIMBATTLE_CXX >= 11 // Most compiler support likely & unlikely since C++11
-		#define IF_LIKELY(x)	if(x) [[likely]]
-		#define IF_UNLIKELY(X)	if(x) [[unlikely]]
-	#else
-		#define IF_LIKELY(x)	if(x)
-		#define IF_UNLIKELY(x)	if(x)
-	#endif
+#if defined(__has_cpp_attribute) && __has_cpp_attribute(likely)
+	#define IF_LIKELY(x)	if(x) [[likely]]
+	#define IF_UNLIKELY(x)	if(x) [[unlikely]]
+#elif SIMBATTLE_CXX >= 11 // Most compiler support likely & unlikely since C++11
+	#define IF_LIKELY(x)	if(x) [[likely]]
+	#define IF_UNLIKELY(X)	if(x) [[unlikely]]
+#else
+	#define IF_LIKELY(x)	if(x)
+	#define IF_UNLIKELY(x)	if(x)
 #endif
 
 #endif // _SIMBATTLE_PCH_H_

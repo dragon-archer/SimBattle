@@ -3,9 +3,10 @@
 
 MainWindow::MainWindow(QWidget *parent)
 	: QMainWindow(parent), startPoint(Global::startPoint), drawShadow(false) {
-	if(!loadResource()) {
-		QMessageBox::critical(this, tr("Error"), tr("Failed to load resource file!"), QMessageBox::Ok, QMessageBox::Ok);
-		exitProgram();
+	IF_UNLIKELY(!initComponents()) {
+		qCritical("Failed to init components");
+		QMessageBox::critical(this, tr("Error"), tr("Failed to init components"), QMessageBox::Ok, QMessageBox::Ok);
+		exitProgram(1);
 		return;
 	}
 	this->setFixedSize(Global::windowWidth, Global::windowHeight);
@@ -15,6 +16,16 @@ MainWindow::MainWindow(QWidget *parent)
 }
 
 MainWindow::~MainWindow() {
+}
+
+bool MainWindow::initComponents() {
+	IF_UNLIKELY(!Unit::initDataMap()) {
+		qCritical("Unit::initDataMap failed");
+		return false;
+	} else {
+		qInfo("Unit::initDataMap success");
+	}
+	return true;
 }
 
 void MainWindow::paintEvent(QPaintEvent* event) {

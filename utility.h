@@ -9,7 +9,7 @@
 class HexPosition;
 
 // Init functions
-bool loadResource();
+bool loadResource(const QString& path, json& j);
 
 // Paint functions
 void setupPainter(QPainter& painter, QPaintDevice* object);
@@ -20,8 +20,11 @@ void drawHexagon(QPainter& painter, QPointF startPoint, double r = Global::block
 // Transfom functions
 HexPosition posToHex(double x, double y, double r = Global::blockRadius);
 
+// Logging functions
+ void messageOutput(QtMsgType msgType, const QMessageLogContext& ctx, const QString& msg);
+
 // Others
-void exitProgram(); // TODO: Find a better way to exit Qt. Qt's design is stupid here.
+void exitProgram(int exitCode); // TODO: Find a better way to exit Qt. Qt's design is stupid here.
 
 // Class Definitions
 class HexPosition {

@@ -16,6 +16,8 @@ find_package(Qt6 COMPONENTS Widgets LinguistTools REQUIRED)
 
 set(TS_FILE	localisation/SimBattle_zh_CN.ts
 			localisation/qtbase_zh_CN.ts)
+set(DATA_DIR    data)
+set(DATA_FILE	${DATA_DIR}/units.json)
 
 set(PROJECT_SOURCES
 		main.cpp
@@ -28,15 +30,19 @@ set(PROJECT_SOURCES
 		utility.cpp
 		utility.h
 		${TS_FILE}
+		${DATA_FILE}
 )
 
 qt_add_executable(${PROJECT_NAME}
 	MANUAL_FINALIZATION
 	${PROJECT_SOURCES}
 )
-
 qt_add_translations(${PROJECT_NAME} TS_FILES ${TS_FILE}
 					RESOURCE_PREFIX "/localisation")
+add_custom_command( TARGET ${PROJECT_NAME}
+					POST_BUILD
+					COMMAND ${CMAKE_COMMAND} -E copy ${DATA_FILE} ${CMAKE_BINARY_DIR}/${DATA_DIR}
+					WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
 
 target_link_libraries(${PROJECT_NAME} PRIVATE Qt6::Widgets)
 target_precompile_headers(SimBattle PRIVATE pch.h)

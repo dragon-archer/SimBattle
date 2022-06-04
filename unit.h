@@ -18,10 +18,16 @@ struct UnitData {
 class Unit : public QWidget {
 		Q_OBJECT
 	public:
+		using MapType = std::unordered_map<QString, UnitData>;
+
 		Unit(QWidget* parent = nullptr);
 		~Unit();
+
+		static bool initDataMap();
 	private:
 		UnitData _data;
+
+		static MapType dataMap;
 };
 
 #endif // _SIMBATTLE_UNIT_H_

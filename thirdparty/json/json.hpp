@@ -13183,7 +13183,6 @@ namespace detail
 template<typename CharType> struct output_adapter_protocol
 {
     virtual void write_character(CharType c) = 0;
-    virtual void write_characters(double c) = 0;
     virtual void write_characters(const CharType* s, std::size_t length) = 0;
     virtual ~output_adapter_protocol() = default;
 
@@ -13235,11 +13234,6 @@ class output_stream_adapter : public output_adapter_protocol<CharType>
     void write_character(CharType c) override
     {
         stream.put(c);
-    }
-
-    void write_characters(double c) override
-    {
-        stream << c;
     }
 
     JSON_HEDLEY_NON_NULL(2)
@@ -16849,11 +16843,10 @@ class serializer
 
     void dump_float(number_float_t x, std::true_type /*is_ieee_single_or_double*/)
     {
-    //     auto* begin = number_buffer.data();
-    //     auto* end = ::nlohmann::detail::to_chars(begin, begin + number_buffer.size(), x);
+        auto* begin = number_buffer.data();
+        auto* end = ::nlohmann::detail::to_chars(begin, begin + number_buffer.size(), x);
 
-    //     o->write_characters(begin, static_cast<size_t>(end - begin));
-        o->write_characters(x);
+        o->write_characters(begin, static_cast<size_t>(end - begin));
     }
 
     void dump_float(number_float_t x, std::false_type /*is_ieee_single_or_double*/)

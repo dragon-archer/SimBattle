@@ -1,8 +1,22 @@
 #include "pch.h"
 #include "utility.h"
 
-bool loadResource() {
-	return false;
+bool loadResource(const QString& path, json& j) {
+	QFile f(path);
+	if(!f.open(QIODevice::ReadOnly)) {
+		return false;
+	}
+	QByteArray d = f.readAll();
+	if(d.isEmpty()) {
+		return false;
+	}
+	j.clear();
+	try {
+		j = json::parse(d.begin(), d.end());
+	} catch(...) {
+		return false;
+	}
+	return true;
 }
 
 void setupPainter(QPainter& painter, QPaintDevice* object) {
@@ -157,9 +171,32 @@ HexPosition posToHex(double x, double y, double r) {
 	return HexPosition{i, j};
 }
 
-void exitProgram() {
+void messageOutput(QtMsgType msgType, const QMessageLogContext& ctx, const QString& msg) {
+	static QFile logFile("SimBattle.log");
+	static QString typeToString[5] = {"Debug", "Warning", "Critical", "Fatal", "Info"};
+	static bool isInited = false;
+	IF_UNLIKELY(!isInited) {
+		logFile.open(QIODevice::Append | QIODevice::WriteOnly);
+		isInited = true;
+	}
+	QString msgstr = QString("[%1][%2][%3:%4:%5]: %6\n")
+					.arg(QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss"))
+					.arg(typeToString[msgType])
+					.arg(ctx.file)
+					.arg(ctx.line)
+					.arg(ctx.function)
+					.arg(msg);
+	logFile.write(msgstr.toLocal8Bit());
+#ifndef NDEBUG
+	fprintf(stderr, "%s", msgstr.toLocal8Bit().data());
+#endif
+}
+
+void exitProgram(int exitCode) {
 	QTimer* timer = new QTimer;
 	timer->setInterval(100);
-	QObject::connect(timer, QTimer::timeout, qApp, QApplication::quit, Qt::QueuedConnection);
+	QObject::connect(timer, QTimer::timeout, [exitCode](){
+		qApp->exit(exitCode);
+	});
 	timer->start();
 }

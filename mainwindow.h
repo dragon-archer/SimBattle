@@ -4,6 +4,7 @@
 #define _SIMBATTLE_MAINWINDOW_H_ 1
 
 #include "pch.h"
+#include "unit.h"
 #include "utility.h"
 
 class MainWindow : public QMainWindow
@@ -16,6 +17,8 @@ class MainWindow : public QMainWindow
 	protected:
 		void paintEvent(QPaintEvent* event) override;
 		void mouseMoveEvent(QMouseEvent* event) override;
+
+		bool initComponents();
 
 	private:
 		QMessageBox* m;
