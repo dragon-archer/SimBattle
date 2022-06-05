@@ -37,79 +37,81 @@ void setupPainter(QPainter& painter, QPaintDevice* object) {
 // Note: Result is cached, so colCount, rowCount, and radius should not change
 void drawGrid(QPainter& painter, QPointF startPoint, int rowCount, int colCount, double radius) {
 	static QPixmap bgPixmap;
-	static bool isInited = false;
+	static bool	   isInited = false;
 	IF_LIKELY(isInited) {
 		painter.drawPixmap(startPoint, bgPixmap);
 		return;
 	}
 	QPainter p;
-	QImage bgImage(sqrt(3) * radius * (colCount + 0.5), radius * (1.5 * rowCount + 0.5), QImage::Format_ARGB32_Premultiplied);
+	QImage	 bgImage(sqrt(3) * radius * (colCount + 0.5), radius * (1.5 * rowCount + 0.5), QImage::Format_ARGB32_Premultiplied);
 	setupPainter(p, &bgImage);
 
-	double r = radius;
+	double r	  = radius;
 	double sqrt3r = r * sqrt(3);
 	for(int i = 0; i < colCount; ++i) {
 		for(int j = 0; j < rowCount; ++j) {
 			if(j & 1) {
 				// bottom -> top
-				p.drawLine( i * sqrt3r, 0.5 * r + 1.5 * r * j,
-							i * sqrt3r, 1.5 * r + 1.5 * r * j);
+				p.drawLine(i * sqrt3r, 0.5 * r + 1.5 * r * j,
+						   i * sqrt3r, 1.5 * r + 1.5 * r * j);
 				// bottom left -> top right
-				p.drawLine( i * sqrt3r + 0.5 * sqrt3r, 1.5 * r * j,
-							i * sqrt3r + 1.0 * sqrt3r, 0.5 * r + 1.5 * r * j);
+				p.drawLine(i * sqrt3r + 0.5 * sqrt3r, 1.5 * r * j,
+						   i * sqrt3r + 1.0 * sqrt3r, 0.5 * r + 1.5 * r * j);
 				// bottom right -> top left
-				p.drawLine( i * sqrt3r + 0.5 * sqrt3r, 1.5 * r * j,
-							i * sqrt3r, 0.5 * r + 1.5 * r * j);
+				p.drawLine(i * sqrt3r + 0.5 * sqrt3r, 1.5 * r * j,
+						   i * sqrt3r, 0.5 * r + 1.5 * r * j);
 			} else {
 				// bottom -> top
-				p.drawLine( i * sqrt3r + 0.5 * sqrt3r, 0.5 * r + 1.5 * r * j,
-							i * sqrt3r + 0.5 * sqrt3r, 1.5 * r + 1.5 * r * j);
+				p.drawLine(i * sqrt3r + 0.5 * sqrt3r, 0.5 * r + 1.5 * r * j,
+						   i * sqrt3r + 0.5 * sqrt3r, 1.5 * r + 1.5 * r * j);
 				// bottom left -> top right
-				p.drawLine( i * sqrt3r + 1.0 * sqrt3r, 1.5 * r * j,
-							i * sqrt3r + 1.5 * sqrt3r, 0.5 * r + 1.5 * r * j);
+				p.drawLine(i * sqrt3r + 1.0 * sqrt3r, 1.5 * r * j,
+						   i * sqrt3r + 1.5 * sqrt3r, 0.5 * r + 1.5 * r * j);
 				// bottom right -> top left
-				p.drawLine( i * sqrt3r + 1.0 * sqrt3r, 1.5 * r * j,
-							i * sqrt3r + 0.5 * sqrt3r, 0.5 * r + 1.5 * r * j);
+				p.drawLine(i * sqrt3r + 1.0 * sqrt3r, 1.5 * r * j,
+						   i * sqrt3r + 0.5 * sqrt3r, 0.5 * r + 1.5 * r * j);
 			}
 			// Special: right boarder
 			// j is even & i not zero
 			if((j & 1) && !i) {
-				p.drawLine( 0, 1.5 * r + 1.5 * r * j,
-							0.5 * sqrt3r, 2.0 * r + 1.5 * r * j);
+				p.drawLine(0, 1.5 * r + 1.5 * r * j,
+						   0.5 * sqrt3r, 2.0 * r + 1.5 * r * j);
 			}
 		}
 		// j == rowCount - 1
 		double basex = 0;
-		if(rowCount & 1) basex = -0.5 * sqrt3r;
+		if(rowCount & 1)
+			basex = -0.5 * sqrt3r;
 		// bottom left -> top right
-		p.drawLine( basex + i * sqrt3r + 1.0 * sqrt3r, 1.5 * r * rowCount,
-					basex + i * sqrt3r + 1.5 * sqrt3r, 0.5 * r + 1.5 * r * rowCount);
+		p.drawLine(basex + i * sqrt3r + 1.0 * sqrt3r, 1.5 * r * rowCount,
+				   basex + i * sqrt3r + 1.5 * sqrt3r, 0.5 * r + 1.5 * r * rowCount);
 		// bottom right -> top left
 		IF_LIKELY(i) {
-			p.drawLine( basex + i * sqrt3r + 1.0 * sqrt3r, 1.5 * r * rowCount,
-						basex + i * sqrt3r + 0.5 * sqrt3r, 0.5 * r + 1.5 * r * rowCount);
+			p.drawLine(basex + i * sqrt3r + 1.0 * sqrt3r, 1.5 * r * rowCount,
+					   basex + i * sqrt3r + 0.5 * sqrt3r, 0.5 * r + 1.5 * r * rowCount);
 		}
 	}
 	for(int j = 0; j < rowCount; ++j) {
 		if(j & 1) {
 			// bottom -> top
-			p.drawLine( colCount * sqrt3r, 0.5 * r + 1.5 * r * j,
-						colCount * sqrt3r, 1.5 * r + 1.5 * r * j);
+			p.drawLine(colCount * sqrt3r, 0.5 * r + 1.5 * r * j,
+					   colCount * sqrt3r, 1.5 * r + 1.5 * r * j);
 			// bottom right -> top left
 			IF_LIKELY(j) {
-				p.drawLine( colCount * sqrt3r + 0.5 * sqrt3r, 1.5 * r * j,
-							colCount * sqrt3r, 0.5 * r + 1.5 * r * j);
+				p.drawLine(colCount * sqrt3r + 0.5 * sqrt3r, 1.5 * r * j,
+						   colCount * sqrt3r, 0.5 * r + 1.5 * r * j);
 			}
 		} else {
 			// bottom -> top
-			p.drawLine( colCount * sqrt3r + 0.5 * sqrt3r, 0.5 * r + 1.5 * r * j,
-						colCount * sqrt3r + 0.5 * sqrt3r, 1.5 * r + 1.5 * r * j);
+			p.drawLine(colCount * sqrt3r + 0.5 * sqrt3r, 0.5 * r + 1.5 * r * j,
+					   colCount * sqrt3r + 0.5 * sqrt3r, 1.5 * r + 1.5 * r * j);
 		}
 	}
 	double basex = 0;
-	if(rowCount & 1) basex = 0.5 * sqrt3r;
-	p.drawLine( basex + colCount * sqrt3r, 1.5 * r * rowCount,
-				basex + colCount * sqrt3r - 0.5 * sqrt3r, 0.5 * r + 1.5 * r * rowCount);
+	if(rowCount & 1)
+		basex = 0.5 * sqrt3r;
+	p.drawLine(basex + colCount * sqrt3r, 1.5 * r * rowCount,
+			   basex + colCount * sqrt3r - 0.5 * sqrt3r, 0.5 * r + 1.5 * r * rowCount);
 
 	p.end();
 	bgPixmap = QPixmap::fromImage(bgImage);
@@ -120,32 +122,32 @@ void drawGrid(QPainter& painter, QPointF startPoint, int rowCount, int colCount,
 // Note: reesult is cached, so radius should not change
 void drawHexagon(QPainter& painter, QPointF startPoint, double r) {
 	static QPixmap hexagonPixmap;
-	static bool isInited = false;
+	static bool	   isInited = false;
 	IF_LIKELY(isInited) {
 		painter.drawPixmap(startPoint, hexagonPixmap);
 		return;
 	}
-	double r1 = r * sqrt(3) / 2, r2 = r * 0.5;
-	QPolygonF hexagon { QPointF{r1, 0}, QPointF{2 * r1, r2},
-						QPointF{2 * r1, 3 * r2}, QPointF{r1, 2 * r},
-						QPointF{0, 3 * r2}, QPointF{0, r2}};
-	QImage hexagonImage(2 * r1, 2 * r, QImage::Format_ARGB32_Premultiplied);
-	QPainter p;
+	double	  r1 = r * sqrt(3) / 2, r2 = r * 0.5;
+	QPolygonF hexagon { QPointF { r1, 0 }, QPointF { 2 * r1, r2 },
+						QPointF { 2 * r1, 3 * r2 }, QPointF { r1, 2 * r },
+						QPointF { 0, 3 * r2 }, QPointF { 0, r2 } };
+	QImage	  hexagonImage(2 * r1, 2 * r, QImage::Format_ARGB32_Premultiplied);
+	QPainter  p;
 	setupPainter(p, &hexagonImage);
 	p.drawPolygon(hexagon);
 	p.end();
 	hexagonPixmap = QPixmap::fromImage(hexagonImage);
-	isInited = true;
+	isInited	  = true;
 }
 
 HexPosition posToHex(double x, double y, double r) {
-	double sqrt3 = sqrt(3);
+	double sqrt3  = sqrt(3);
 	double sqrt3r = r * sqrt3;
 	double r0;
-	int i = floor(x / sqrt3r);
-	int j = floor(y / (1.5 * r));
-	bool odd = j & 1;
-	r0 = y - 1.5 * j * r;
+	int	   i   = floor(x / sqrt3r);
+	int	   j   = floor(y / (1.5 * r));
+	bool   odd = j & 1;
+	r0		   = y - 1.5 * j * r;
 	IF_LIKELY(r0 >= 0.5 * r) { // easy mode
 		if(!odd) {
 			i = floor((x - 0.5 * sqrt3r) / sqrt3r);
@@ -153,39 +155,41 @@ HexPosition posToHex(double x, double y, double r) {
 	} else {
 		double r1 = x - i * sqrt3r;
 		if(!odd) {
-			i = floor((x - 0.5 * sqrt3r) / sqrt3r);
+			i  = floor((x - 0.5 * sqrt3r) / sqrt3r);
 			r1 = x - 0.5 * sqrt3r - i * sqrt3r;
 		}
 		if(r1 <= 0.5 * sqrt3r) {
 			if(r0 * sqrt3 <= (0.5 * sqrt3r - r1)) {
-				if(odd) i -= 1;
+				if(odd)
+					i -= 1;
 				j -= 1;
 			}
 		} else {
 			if(r0 * sqrt3 <= (r1 - 0.5 * sqrt3r)) {
 				j -= 1;
-				if(!odd) i += 1;
+				if(!odd)
+					i += 1;
 			}
 		}
 	}
-	return HexPosition{i, j};
+	return HexPosition { i, j };
 }
 
 void messageOutput(QtMsgType msgType, const QMessageLogContext& ctx, const QString& msg) {
-	static QFile logFile("SimBattle.log");
-	static QString typeToString[5] = {"Debug", "Warning", "Critical", "Fatal", "Info"};
-	static bool isInited = false;
+	static QFile   logFile("SimBattle.log");
+	static QString typeToString[5] = { "Debug", "Warning", "Critical", "Fatal", "Info" };
+	static bool	   isInited		   = false;
 	IF_UNLIKELY(!isInited) {
 		logFile.open(QIODevice::Append | QIODevice::WriteOnly);
 		isInited = true;
 	}
 	QString msgstr = QString("[%1][%2][%3:%4:%5]: %6\n")
-					.arg(QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss"))
-					.arg(typeToString[msgType])
-					.arg(ctx.file)
-					.arg(ctx.line)
-					.arg(ctx.function)
-					.arg(msg);
+						 .arg(QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss"))
+						 .arg(typeToString[msgType])
+						 .arg(ctx.file)
+						 .arg(ctx.line)
+						 .arg(ctx.function)
+						 .arg(msg);
 	logFile.write(msgstr.toLocal8Bit());
 #ifndef NDEBUG
 	fprintf(stderr, "%s", msgstr.toLocal8Bit().data());
@@ -195,7 +199,7 @@ void messageOutput(QtMsgType msgType, const QMessageLogContext& ctx, const QStri
 void exitProgram(int exitCode) {
 	QTimer* timer = new QTimer;
 	timer->setInterval(100);
-	QObject::connect(timer, QTimer::timeout, [exitCode](){
+	QObject::connect(timer, &QTimer::timeout, [exitCode]() {
 		qApp->exit(exitCode);
 	});
 	timer->start();

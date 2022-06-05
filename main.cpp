@@ -1,17 +1,16 @@
 #include "pch.h"
 #include "mainwindow.h"
 
-int main(int argc, char *argv[])
-{
+int main(int argc, char* argv[]) {
 	QApplication a(argc, argv);
 	qInstallMessageHandler(messageOutput);
 	QTranslator qtTranslator, appTranslator;
 	if(qtTranslator.load(":/localisation/qtbase_zh_CN")) {
-		qInfo("Load Qt Translation");
+		qDebug("Load Qt Translation");
 		a.installTranslator(&qtTranslator);
 	}
 	if(appTranslator.load(":/localisation/SimBattle_zh_CN")) {
-		qInfo("Load SimBattle Translation");
+		qDebug("Load SimBattle Translation");
 		a.installTranslator(&appTranslator);
 	}
 	MainWindow w;

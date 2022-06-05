@@ -21,7 +21,7 @@ void drawHexagon(QPainter& painter, QPointF startPoint, double r = Global::block
 HexPosition posToHex(double x, double y, double r = Global::blockRadius);
 
 // Logging functions
- void messageOutput(QtMsgType msgType, const QMessageLogContext& ctx, const QString& msg);
+void messageOutput(QtMsgType msgType, const QMessageLogContext& ctx, const QString& msg);
 
 // Others
 void exitProgram(int exitCode); // TODO: Find a better way to exit Qt. Qt's design is stupid here.
@@ -31,9 +31,11 @@ class HexPosition {
 	private:
 		int16_t _x;
 		int16_t _y;
+
 	public:
 		HexPosition(int32_t x = 0, int32_t y = 0)
-			:_x(x), _y(y) {}
+			: _x(x)
+			, _y(y) { }
 
 		inline int16_t& x() {
 			return _x;
@@ -57,7 +59,7 @@ class HexPosition {
 			if(!(_y & 1)) {
 				a += 0.5 * sqrt3r;
 			}
-			return QPointF{a, b};
+			return QPointF { a, b };
 		}
 		QPointF toCenter(double r = Global::blockRadius) const {
 			double sqrt3r = r * sqrt(3);
@@ -65,7 +67,7 @@ class HexPosition {
 			if(!(_y & 1)) {
 				a += 0.5 * sqrt3r;
 			}
-			return QPointF{a, b};
+			return QPointF { a, b };
 		}
 		inline bool isValid(int rowCount = Global::rowCount, int colCount = Global::colCount) const {
 			return (_x >= 0) && (_y >= 0) && (_x < colCount) && (_y < rowCount);

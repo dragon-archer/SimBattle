@@ -6,13 +6,13 @@
 #include "pch.h"
 
 struct UnitData {
-	uint16_t health;
-	uint16_t attack;
-	uint16_t defense;
-	uint16_t minDamage;
-	uint16_t maxDamage;
-	uint16_t speed;
-	uint16_t shots;
+		uint16_t health;
+		uint16_t attack;
+		uint16_t defense;
+		uint16_t minDamage;
+		uint16_t maxDamage;
+		uint16_t speed;
+		uint16_t shots;
 };
 
 class Unit : public QWidget {
@@ -24,8 +24,10 @@ class Unit : public QWidget {
 		~Unit();
 
 		static bool initDataMap();
+
 	private:
-		UnitData _data;
+		UnitData m_data;
+		QString	 m_name;
 
 		static MapType dataMap;
 };
